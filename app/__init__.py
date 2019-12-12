@@ -12,16 +12,14 @@
     Description :       
 -------------------------------------------------
 """
-import random
-import string
-import time
-import uuid
+import base64
+import io
 
-from flask import Flask, request, g
+from flask import Flask, request, g, send_file
 from flask_cors import CORS
 
 from app import jsonReturn
-from app.auth.jwt import JWT
+from app.utils.jwt import JWT
 from app.models.User import User, Role, Permission
 from config import load_config
 
@@ -34,16 +32,34 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(config)
     # CORS(app)
-    CORS(app, resources	={r"/*": {"expose_headers": ["Authorization"]}})
+    CORS(app, resources={r"/*": {"expose_headers": ["Authorization"]}})
 
     # Alternatively, you can specify CORS options on a resource and origin level of granularity by passing a dictionary as the resources option, mapping paths to a set of options. See the full list of options in the documentation.
     # cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    from app.models import db
+    from app.models import db, ma
     db.init_app(app)
+    # 序列化 反序列化 插件
+    ma.init_app(app)
+    # 把各个蓝图在注册进来，routes中的bp
+    from app import routes
+    from flask.blueprints import Blueprint
 
-    from app.auth.api import init_api
-    init_api(app)
+    def _import_submodules_from_package(package):
+        import pkgutil
+
+        modules = []
+        # 在只知道包名的情况下，成功获取了包下所有模块
+        for importer, modname, ispkg in pkgutil.iter_modules(package.__path__, prefix=package.__name__ + "."):
+            print("{} name: {}, is_sub_package: {}".format(importer, modname, ispkg))
+            modules.append(__import__(modname, fromlist="dummy"))
+        return modules
+
+    for module in _import_submodules_from_package(routes):
+        bp = getattr(module, 'bp')
+        if bp and isinstance(bp, Blueprint):
+            # 注册蓝图
+            app.register_blueprint(bp)
 
     @app.before_first_request
     def create_admin_casual_user():
@@ -87,7 +103,7 @@ def create_app():
                 g.username = username
                 # 鉴权 rbac
                 # TODO 这里需要改成 redis 取 permissions 后，设置为redis 直接存 user->permissions
-                permissions = set(config.allow_urls)
+                permissions = set(config.ALLOWED_URL)
                 for role in user.roles:
                     # print(role)
                     for permission in role.permissions:
@@ -102,12 +118,12 @@ def create_app():
                 # print(payload)
                 return jsonReturn.falseReturn('', payload)
         else:
-            # TODO token不存在只有一种情况： 系统临时用户，权限只有config['allow_urls']里的
+            # TODO token不存在只有一种情况： 系统临时用户，权限只有config['ALLOWED_URL']里的
             # 生成唯一id
             # uuid_id = uuid.uuid5(uuid.NAMESPACE_DNS, str(time.time()) + "".join(
             #     random.choice(string.ascii_letters + string.digits) for _ in range(16)))
             # 不在可匿名访问的目录中，就返回错误
-            if request.path not in config.allow_urls:
+            if request.path not in config.ALLOWED_URL:
                 return jsonReturn.falseReturn(request.path, '需要登录')
 
     # 请求结束后干的事

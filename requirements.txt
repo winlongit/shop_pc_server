@@ -5,3 +5,11 @@ flask
 flask_mongoengine
 flask-cors
 bcrypt
+wechatpy[cryptography]
+# 我推荐你用flask_wtf，这个插件，这个插件是对wtfoms的进一步封装，支持form，也支持json，CSRF,文件上传。
+# https://segmentfault.com/q/1010000011140705
+flask_wtf
+# Marshmallow flask-marshmallow https://blog.igevin.info/posts/flask-rest-serialize-deserialize/
+# flask-marshmallow https://flask-marshmallow.readthedocs.io/en/latest/
+flask-marshmallow
+# marshmallow-mongoengine 不要用，还是 3 年前的版本了，现在用不了

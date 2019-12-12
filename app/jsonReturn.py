@@ -20,16 +20,20 @@ __author__ = 'Max_Pengjb'
 def trueReturn(data, msg):
     return jsonify({
         "status": "success",
+        "message": "success",
         "code": "200",
-        "data": data,
+        "result": data,
         "msg": msg,
+        "success": True
     })
 
 
 def falseReturn(data, msg):
     return jsonify({
         "status": "failed",
+        "message": "failed",
         "code": "500",
-        "data": data,
+        "result": data,
         "msg": msg,
+        "success": False
     })
