@@ -48,8 +48,8 @@ def register():
     # username = request.form.get('username')
     # password = request.form.get('password')
     req_json = request.json
-    username = req_json.get('username')
-    password = req_json.get('password')
+    username = req_json.get('userName')
+    password = req_json.get('userPwd')
     if not username or not password:
         return jsonReturn.falseReturn('', '用户名和密码不能为空')
     if User.objects(username=username).first():
