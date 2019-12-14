@@ -65,6 +65,7 @@ class SMMSV2:
                 # print(upload_res['images'])
                 return upload_res['images']
             else:
-                raise SmmsError('sm.ms图片上传失败。请稍后再试。')
+                print('upload_res', upload_res)
+                raise SmmsError('sm.ms图片上传失败。请稍后再试。' + upload_res['message'])
         else:
             raise SmmsError('sm.ms登录失败，获取token失败')

@@ -92,20 +92,20 @@ def get_goods():
     }
     :return: total,data:[]
     """
-    req_json = request.json
+    req_args = request.args
     page = 1
     page_size = 20
     # 请求如果不带参数，那就是默认的，这样最好，什么条件都不用加
     query_set = Product.objects()
-    if req_json:
-        page = req_json.get('page', 1)
+    if req_args:
+        page = req_args.get('page', 1)
         print(page)
-        page_size = req_json.get('page_size', 20)
-        sort = req_json.get('sort')
-        price_min = req_json.get('price_min')
-        price_max = req_json.get('price_max')
-        category_lv1 = req_json.get('type')
-        category_lv2 = req_json.get('category')
+        page_size = req_args.get('page_size', 20)
+        sort = req_args.get('sort')
+        price_min = req_args.get('price_min')
+        price_max = req_args.get('price_max')
+        category_lv1 = req_args.get('type')
+        category_lv2 = req_args.get('category')
         # from mongoengine.queryset.visitor import Q
         # 类别空的话，就不需要在类别里面搜索
         if category_lv1:
@@ -173,6 +173,9 @@ def add_good():
     swiper_pics = [swiper_image['sm_url'] for swiper_image in sorted(swiperImages, key=lambda x: x['order'])]
     descImages = req_json.get('descImages')
     desc_pics = [desc_image['sm_url'] for desc_image in sorted(descImages, key=lambda x: x['order'])]
-    rs = Product(name=name, title=title, origin_price=origin_price, cur_price=cur_price, categories=categories,
-                 swiper_pics=swiper_pics, desc_pics=desc_pics).save()
-    return jsonReturn.trueReturn(rs, '中文怎么回事')
+    try:
+        rs = Product(name=name, title=title, origin_price=origin_price, cur_price=cur_price, categories=categories,
+                     swiper_pics=swiper_pics, desc_pics=desc_pics).save()
+        return jsonReturn.trueReturn(rs, 'ok')
+    except Exception as e:
+        return jsonReturn.trueReturn('', '上传失败 ' + str(e))

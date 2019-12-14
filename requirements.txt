@@ -13,3 +13,5 @@ flask_wtf
 # flask-marshmallow https://flask-marshmallow.readthedocs.io/en/latest/
 flask-marshmallow
 # marshmallow-mongoengine 不要用，还是 3 年前的版本了，现在用不了
+# 腾讯对象存储 COS SDK
+cos-python-sdk-v5

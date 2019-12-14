@@ -21,7 +21,7 @@ __author__ = 'Max_Pengjb'
 
 class Picture(db.Document):
     creator = db.StringField(max_length=255, verbose_name='上传者，创建人 id')
-    smms_url = db.StringField(max_length=512, required=True, verbose_name='smms图床url', unique=True)
+    url = db.StringField(max_length=512, required=True, verbose_name='smms图床url', unique=True)
 
     # 本地也保存的时候用，我们这里姑且保存一下吧
     image = db.ImageField(verbose_name='图片', thumbnail_size=(200, 200, True))

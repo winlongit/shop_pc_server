@@ -34,6 +34,12 @@ class Config(object):
     # Root path of project
     PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
+    COS_APPID = '1259477036'
+    COS_SECRETID = 'AKIDJQIzSfqYBXcS3OqO3SaTKuDF4LM58lhM'
+    COS_SECRETKEY = 'Yt1uWt0sTJWWIn33nGUXLtBD4g3B8tPf'
+    COS_REGION = 'ap-shanghai'
+    COS_BUCKET = 'ailemong-1259477036'
+    CDN_DOMAIN = 'http://cdn.ailemong.com/'
     # 允许上传的图片类型
     ALLOWED_IMAGE = {'png', 'jpg', 'jpeg', 'gif'}
     # 允许免登录的 url，不需要登录也可以访问
@@ -57,5 +63,8 @@ class Config(object):
                    '/api/v1/address/delAddress',
                    '/api/v1/order/new_order',
                    '/api/v1/order/query_order',
-                   '/api/v1/order/get_orders'
+                   '/api/v1/order/get_orders',
+                   '/api/v1/order/notifyurl',
+                   '/api/v1/home/add_frame',
+                   '/api/v1/home/get_frame'
                    ]

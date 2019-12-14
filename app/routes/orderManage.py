@@ -13,6 +13,7 @@
 -------------------------------------------------
 """
 from bson import ObjectId
+from wechatpy.exceptions import InvalidSignatureException
 
 from app.models.Cart import Cart
 from app.models.Product import Product
@@ -109,7 +110,7 @@ def new_order():
                              total_fee=total_fee,  # 订单总金额，单位为分
                              notify_url=notify_url,  # 异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的 http 地址，不能是 https ，不能携带参数。
                              # user_id=request.args.get("openid"),  # 小程序appid下的唯一标识 trade_type=JSAPI和sub_appid已设定，此参数必传
-                             body="乐盟商城Native扫码支付",  # 商品详细描述，对于使用单品优惠的商户，该字段必须按照规范上传
+                             body="乐盟商城",  # 商品详细描述，对于使用单品优惠的商户，该字段必须按照规范上传
                              out_trade_no=str(user_order.id),  # 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一
                              )
     # 微信统一下单接口 https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_1
@@ -166,12 +167,26 @@ def get_order():
 def get_notify_url():
     notify_data = request.data
     print(notify_data)
-    data = wx_pay.parse_payment_result(notify_data)
-    print(data)
-    # 然后就可以根据返回的结果，处理之前的订单了。
-    # TODO 写上处理结果的逻辑。存储数据库之类的
-    # 唯一需要注意的一点，微信推送消息后，需要给微信服务器返回一个消息：
-    return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>"
+    try:
+        # parse_payment_result 有对通知合法性的验证， 通过 sign 来对比
+        data = wx_pay.parse_payment_result(notify_data)
+        # 通知的格式 https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_7&index=8
+        print(data)
+        if data['return_code'] == 'SUCCESS' and data['result_code'] == 'SUCCESS':
+            order_id = data['out_trade_no']
+            total_fee = data['total_fee']
+            try:
+                # 这里加个 total_fee=total_fee 是为了验证支付的金额和我们应该收到的金额是一样的
+                UserOrder.objects(id=ObjectId(order_id), total_fee=total_fee).update_one(ischeck=True, status='支付成功')
+                # 然后就可以根据返回的结果，处理之前的订单了。
+                # TODO 写上处理结果的逻辑。存储数据库之类的
+                # 唯一需要注意的一点，微信推送消息后，需要给微信服务器返回一个消息：
+                return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>"
+            except Exception as e:
+                print(e)
+    except InvalidSignatureException as e:
+        print(e)
+        return jsonReturn.falseReturn('', '你个骗子，想拿个假的通知骗我？')
 
 
 """  之前没用 wechatpy ， 自己手动写的方法， 能用，但是有现成的封装好的不是更好吗
