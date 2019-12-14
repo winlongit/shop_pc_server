@@ -5,6 +5,7 @@ flask
 flask_mongoengine
 flask-cors
 bcrypt
+pillow
 wechatpy[cryptography]
 # 我推荐你用flask_wtf，这个插件，这个插件是对wtfoms的进一步封装，支持form，也支持json，CSRF,文件上传。
 # https://segmentfault.com/q/1010000011140705
