@@ -32,6 +32,7 @@ class Config(Secret):
     ALLOWED_IMAGE = {'png', 'jpg', 'jpeg', 'gif'}
     # 允许免登录的 url，不需要登录也可以访问
     ALLOWED_URL = ['/api/v1/marshmallowTest/test',
+                   '/api/v1/marshmallowTest/os_mode_test',
                    '/api/v1/user/login',
                    '/api/v1/user/register',
                    '/api/v1/user/admin',

@@ -12,6 +12,7 @@
     Description :       
 -------------------------------------------------
 """
+import os
 from pprint import pprint
 
 from bson import ObjectId
@@ -43,3 +44,11 @@ def test_schema():
     # 然后再使用 jsonify 往 header 中添加 application/json 才表示返回的事 json
     print(testSchema.dump(u))
     return jsonify(testSchema.dump(u))
+
+
+@bp.route('/os_mode_test', methods=['POST', 'GET'])
+def os_mode_test():
+    from config import load_config
+    Config = load_config()
+    mode = os.environ.get('MODE')
+    return jsonify({'mode': mode, 'http_root': Config.HTTP_ROOT})
