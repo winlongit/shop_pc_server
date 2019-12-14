@@ -47,7 +47,7 @@ def register():
     #     return jsonReturn.falseReturn('', form.errors)
     # username = request.form.get('username')
     # password = request.form.get('password')
-    req_json = request.args
+    req_json = request.json
     username = req_json.get('username')
     password = req_json.get('password')
     if not username or not password:
