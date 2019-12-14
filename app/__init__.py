@@ -86,6 +86,7 @@ def create_app():
 
     @app.before_request
     def auth_jwt():
+        # print('config.HTTP_ROOT', config.HTTP_ROOT)
         # 在每一个请求的时候判断token，然后根据请求的 path 判断有没有权限来控制放行
         token = request.headers.get('Authorization')
         # print(token)

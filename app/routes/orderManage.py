@@ -20,7 +20,7 @@ from app.models.Product import Product
 from app.models.User import User
 from app.models.UserOrder import UserOrder, ProductOrder
 from app.utils import mongo2dict
-from config.default import Config
+from config import load_config
 
 __author__ = 'Max_Pengjb'
 
@@ -36,6 +36,7 @@ bp = Blueprint('order', __name__, url_prefix="/api/v1/order")
 #     商户密钥不参与字典序排序
 #     md5后需要转大写
 #     参与排序的字典名要与微信的文档严格保持一致
+Config = load_config()
 wx_id = Config.WX_APPID
 mch_id = Config.MCH_ID
 mch_key = Config.MCH_KEY

@@ -17,7 +17,9 @@ __author__ = 'Max_Pengjb'
 
 import jwt
 import datetime, time
-from config.default import Config
+from config import load_config
+
+Config = load_config()
 
 
 class JWT:

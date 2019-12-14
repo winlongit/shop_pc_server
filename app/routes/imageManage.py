@@ -23,10 +23,11 @@ from flask import Blueprint, send_file, request, jsonify, Response
 
 from app import jsonReturn
 from app.models.Picture import Picture
-from config.default import Config
+from config import load_config
 from app.utils.smmsPic import SMMSV2, SmmsError
 
 # 对象存储的信息
+Config = load_config()
 cos_appid = Config.COS_APPID
 cos_secret_id = Config.COS_SECRETID
 cos_secret_key = Config.COS_SECRETKEY

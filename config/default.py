@@ -1,8 +1,10 @@
 # coding: utf-8
 import os
 
+from .secret import Secret
 
-class Config(object):
+
+class Config(Secret):
     RESULT_ERROR = 0
     RESULT_SUCCESS = 1
 
@@ -13,33 +15,19 @@ class Config(object):
                         'password': ''}
 
     """Base config class."""
-    # Flask app config
-    DEBUG = True
-    TESTING = True
     # token 的过期时间，7200 秒
     EXP_SECONDS = 7200
 
     # TODO 这里下面的所有配置都要全部大写，不然识别不到，不知道为什么，有待查找一下原因
-    # 公众号-服务号
-    WX_APPID = "wxc6221cda3f95b53f"
-    WX_SECRET = "f0e955c30360c2d8aafda507dbb2b908"
-    # 商户号信息
-    MCH_ID = "1533695991"
-    MCH_KEY = "c9a5241f1d9b1a21659f75cb0e3d82ba"
+
     # 这里不能用 https 地址，吃了大亏
-    HTTP_ROOT = "http://swu.mynatapp.cc"
+    # HTTP_ROOT = "" 这个地址根据不同的环境 开发 和 部署  地址不同
 
     SECRET_KEY = "\xb5\xb3}#\xb7A\xcac\x9d0\xb6\x0f\x80z\x97\x00\x1e\xc0\xb8+\xe9)\xf0}"
 
     # Root path of project
     PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-    COS_APPID = '1259477036'
-    COS_SECRETID = 'AKIDJQIzSfqYBXcS3OqO3SaTKuDF4LM58lhM'
-    COS_SECRETKEY = 'Yt1uWt0sTJWWIn33nGUXLtBD4g3B8tPf'
-    COS_REGION = 'ap-shanghai'
-    COS_BUCKET = 'ailemong-1259477036'
-    CDN_DOMAIN = 'http://cdn.ailemong.com/'
     # 允许上传的图片类型
     ALLOWED_IMAGE = {'png', 'jpg', 'jpeg', 'gif'}
     # 允许免登录的 url，不需要登录也可以访问
