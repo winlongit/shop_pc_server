@@ -19,17 +19,16 @@ import os
 
 def load_config():
     """Load config."""
+    # 这也是为了解决 uwsgi 中的 os.environ.get('MODE') 不起作用，物理吐槽这个坑
     mode = os.environ.get('MODE')
     try:
-        if mode == 'PRODUCTION':
-            from .production import ProductionConfig
-            return ProductionConfig
-        elif mode == 'TESTING':
-            from .testing import TestingConfig
-            return TestingConfig
-        else:
+        if mode == 'development':
             from .development import DevelopmentConfig
             return DevelopmentConfig
+        else:
+            from .production import ProductionConfig
+            return ProductionConfig
+
     except ImportError:
         from .default import Config
         return Config

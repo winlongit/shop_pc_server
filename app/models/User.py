@@ -34,6 +34,7 @@ class User(db.Document):
     username = db.StringField(max_length=255, verbose_name='用户名称', required=True, unique=True)
     _password = db.StringField(max_length=255, verbose_name='用户密码')
     active = db.BooleanField(default=True, verbose_name='当前账户是否激活')
+    # avatar = db.StringField(max_length=512, verbose_name='头像url地址',default='http://cdn.ailemong.com/fbfbc403881a41f93f1fa2a37f25424f.png')
 
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
 
