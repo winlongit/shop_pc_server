@@ -102,8 +102,6 @@ def new_order():
         user_order = UserOrder(user_id=user, goodsList=embeddedGoodsList, total_fee=total_fee, userName=userName,
                                tel=tel,
                                streetName=streetName).save()
-        # 通过 userId 来查找他对应的购物车，把这些提交过来的商品在购物车中删掉
-        Cart.objects(user_id=user, product_id__in=cartGoodList).delete()
     except Exception as e:
         return jsonReturn.falseReturn('', '保存到mongodb出错了：' + str(e))
     # 这里还有一个 请求 sign 的构造过程， wechatpy 都已经封装好了
@@ -118,6 +116,11 @@ def new_order():
     # native 支付说明 https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_5
     # 请求支付二维码的code_url成功 return_code=SUCCESS && result_code=SUCCESS
     if rs['return_code'] == 'SUCCESS' and rs['result_code'] == 'SUCCESS':
+        # code_url 还需要存入数据库中，再次支付的时候还要调用一下
+        user_order.code_url = rs['code_url']
+        user_order.save()
+        # 通过 userId 来查找他对应的购物车，把这些提交过来的商品在购物车中删掉
+        Cart.objects(user_id=user, product_id__in=cartGoodList).delete()
         # 获取 code_url 把这个code返回给前端，让前端生成 qrcode
         return jsonReturn.trueReturn({'order_id': str(user_order.id), 'code_url': rs['code_url']}, 'ok')
     else:
@@ -135,6 +138,21 @@ def query_order():
     try:
         user_order = UserOrder.objects(id=ObjectId(order_id)).first()
         return jsonReturn.trueReturn(mongo2dict.m2d(user_order), 'ok')
+    except Exception as e:
+        return jsonReturn.falseReturn(request.path, str(e))
+
+
+@bp.route("/del_order", methods=["POST"])
+def del_order():
+    req_json = request.json
+    if not req_json:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
+    order_id = req_json.get('orderId')
+    if not order_id:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数orderId')
+    try:
+        user_order = UserOrder.objects(id=ObjectId(order_id)).delete()
+        return jsonReturn.trueReturn(user_order, 'ok')
     except Exception as e:
         return jsonReturn.falseReturn(request.path, str(e))
 

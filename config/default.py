@@ -40,9 +40,9 @@ class Config(Secret):
                    '/api/v1/product/get_types',
                    '/api/v1/product/get_goods',
                    '/api/v1/product/add_good',
+                   '/api/v1/product/get_good_detail',
                    '/api/v1/img/test',
                    '/api/v1/img/img_upload_ui',
-                   '/api/v1/product/get_good_detail',
                    '/api/v1/cart/add',
                    '/api/v1/cart/cartList',
                    '/api/v1/cart/edit',
@@ -53,6 +53,7 @@ class Config(Secret):
                    '/api/v1/order/new_order',
                    '/api/v1/order/query_order',
                    '/api/v1/order/get_orders',
+                   '/api/v1/order/del_order',
                    '/api/v1/order/notifyurl',
                    '/api/v1/home/add_frame',
                    '/api/v1/home/get_frame'

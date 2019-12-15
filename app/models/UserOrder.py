@@ -39,6 +39,7 @@ class UserOrder(db.Document):
     user_id = db.ReferenceField(User, required=True, verbose_name='用户id')
 
     goodsList = db.EmbeddedDocumentListField(ProductOrder, required=True, verbose_name='所有订单')
+    code_url = db.StringField(max_length=512, verbose_name='微信支付的二维码链接')
 
     total_fee = db.IntField(verbose_name='订单总金额,单位是 分！', required=True)
 
