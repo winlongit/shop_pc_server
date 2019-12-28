@@ -53,10 +53,26 @@ def get_types():
         res = ProductCategory.objects(father_category=father_category)
         return jsonReturn.trueReturn(res, 'ok')
     except Exception as e:
+        return jsonReturn.falseReturn(request.path, str(e)) @ bp.route('/get_types', methods=['GET'])
+
+
+@bp.route('/get_type_tree', methods=['GET'])
+def get_types_tree():
+    """
+    获取产品的所有分类树，不需要参数
+    :return: json [
+              {value: '健康检测',label: '健康检测', children: [{value: '基因检测',label: '基因检测'},{value: 'xx',label: 'xxx'}]},
+              {value: '健康检测',label: '健康检测', children: [{value: '基因检测',label: '基因检测'}]}
+          ]
+    """
+    try:
+        res = ProductCategory.get_type_tree(father_category=None)
+        return jsonReturn.trueReturn(res, 'ok')
+    except Exception as e:
         return jsonReturn.falseReturn(request.path, str(e))
 
 
-@bp.route('/add_category', methods=['GET'])
+@bp.route('/add_category', methods=['GET', 'POST'])
 def add_type():
     """
     获取产品的分类来构建前端页面的 NavList
@@ -67,11 +83,12 @@ def add_type():
     :return: json
     """
     req_json = request.json
-    category = req_json.get('category')
+    category = req_json.get('category') or req_json.get('name')
     father_category = req_json.get('father_category')
-    if not type:
+    description = req_json.get('description')
+    if not category:
         return jsonReturn.falseReturn(request.path, 'type 参数是必须的')
-    pc = ProductCategory(category=category, father_category=father_category)
+    pc = ProductCategory(category=category, father_category=father_category, description=description)
     try:
         res = pc.save()
         return jsonReturn.trueReturn(res, 'ok')
@@ -99,7 +116,6 @@ def get_goods():
     query_set = Product.objects()
     if req_args:
         page = req_args.get('page', 1)
-        print(page)
         page_size = req_args.get('page_size', 20)
         sort = req_args.get('sort')
         price_min = req_args.get('price_min')
@@ -121,6 +137,9 @@ def get_goods():
                 query_set = query_set.order_by('+cur_price')
             else:
                 query_set = query_set.order_by('-cur_price')
+        else:
+            # 时间逆序，最近的时间越大
+            query_set = query_set.order_by('-create_time')
     query_set = query_set.paginate(page=int(page), per_page=int(page_size))
     # res 是 'Pagination' object is not iterable
     # 序列化问题 https://www.liaoxuefeng.com/wiki/897692888725344/923056033756832
@@ -164,18 +183,70 @@ def add_good():
     req_json = request.json
     name = req_json.get('name')
     title = req_json.get('title')
-    # TODO
+    description = req_json.get('description')
     origin_price = int(Decimal(req_json.get('origin_price')) * 100)
     cur_price = int(Decimal(req_json.get('cur_price')) * 100)
     # 这个分类是多个的，比如
-    categories = [req_json.get('type'), req_json.get('category')]
+    # categories = [req_json.get('type'), req_json.get('category')]
+    categories = req_json.get('categories')
     swiperImages = req_json.get('swiperImages')
-    swiper_pics = [swiper_image['sm_url'] for swiper_image in sorted(swiperImages, key=lambda x: x['order'])]
     descImages = req_json.get('descImages')
+    if not all([name, title, origin_price, cur_price, categories, swiperImages, descImages]):
+        return jsonReturn.falseReturn(request.path, '请上传必须的参数')
+    swiper_pics = [swiper_image['sm_url'] for swiper_image in sorted(swiperImages, key=lambda x: x['order'])]
     desc_pics = [desc_image['sm_url'] for desc_image in sorted(descImages, key=lambda x: x['order'])]
     try:
         rs = Product(name=name, title=title, origin_price=origin_price, cur_price=cur_price, categories=categories,
-                     swiper_pics=swiper_pics, desc_pics=desc_pics).save()
+                     swiper_pics=swiper_pics, desc_pics=desc_pics, description=description).save()
         return jsonReturn.trueReturn(rs, 'ok')
     except Exception as e:
         return jsonReturn.trueReturn('', '上传失败 ' + str(e))
+
+
+@bp.route('/edit_good', methods=['POST'])
+def edit_good():
+    """
+    {'name': '士大夫撒旦',
+    'title': '撒的发斯蒂芬',
+    'origin_price': '1.1',
+    'cur_price': '1.1',
+    'type': '健康服务',
+    'category': '户外运动',
+    'specification': [{'value': '', 'canDelete': False}, {'value': '', 'canDelete': True}],
+    'swiperImages': [{'order': 1, 'sm_url': 'https://i.loli.net/2019/12/08/MlICziL9AsJ5bku.jpg', 'name': 'timg.jpg'}],
+    'descImages': [{'order': 1, 'sm_url': 'https://i.loli.net/2019/12/08/MlICziL9AsJ5bku.jpg', 'name': 'timg.jpg'}]}
+    """
+    print(request.json)
+    req_json = request.json
+    pro_id = req_json.get('id')
+    name = req_json.get('name')
+    title = req_json.get('title')
+    # TODO
+    origin_price = int(req_json.get('origin_price'))
+    cur_price = int(req_json.get('cur_price'))
+    # 这个分类是多个的，比如
+    categories = [req_json.get('type'), req_json.get('category')]
+    swiper_pics = req_json.get('swiperImages')
+    desc_pics = req_json.get('descImages')
+    if not all([pro_id, name, origin_price, cur_price, categories, swiper_pics, desc_pics]):
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
+    try:
+        rs = Product.objects(id=ObjectId(pro_id)).update_one(name=name, title=title, origin_price=origin_price,
+                                                             cur_price=cur_price, categories=categories,
+                                                             swiper_pics=swiper_pics, desc_pics=desc_pics)
+        return jsonReturn.trueReturn(rs, 'ok')
+    except Exception as e:
+        return jsonReturn.trueReturn('', '上传失败 ' + str(e))
+
+
+@bp.route('/real_delete', methods=['POST'])
+def real_delete():
+    req_json = request.json
+    product_id = req_json.get('productId')
+    if not product_id:
+        return jsonReturn.falseReturn(request.path, '请上传必要的参数productId')
+    try:
+        Product.objects(id=ObjectId(product_id)).delete()
+        return jsonReturn.trueReturn('', '删除成功')
+    except Exception as e:
+        return jsonReturn.falseReturn('', str(e))

@@ -38,9 +38,11 @@ class Config(Secret):
                    '/api/v1/user/admin',
                    '/api/v1/product/add_category',
                    '/api/v1/product/get_types',
+                   '/api/v1/product/get_type_tree',
                    '/api/v1/product/get_goods',
                    '/api/v1/product/add_good',
                    '/api/v1/product/get_good_detail',
+                   '/api/v1/product/real_delete',
                    '/api/v1/img/test',
                    '/api/v1/img/img_upload_ui',
                    '/api/v1/cart/add',
@@ -58,5 +60,6 @@ class Config(Secret):
                    '/api/v1/home/add_frame',
                    '/api/v1/home/edit_frame',
                    '/api/v1/home/frame_panel/add',
+                   '/api/v1/home/frame_panel/del',
                    '/api/v1/home/get_frame'
                    ]

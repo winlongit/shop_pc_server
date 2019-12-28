@@ -79,6 +79,24 @@ def frame_panel_add():
     return jsonReturn.trueReturn(home_frame, 'ok')
 
 
+@bp.route("/frame_panel/del", methods=['POST'])
+def frame_panel_del():
+    # 轮播图：2240 x 1108
+    req_json = request.json
+    if not req_json:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
+    frame_id = req_json.get('id')
+    # 需要删除的index，第几个
+    index = req_json.get('index')
+    if not all([frame_id, index]):
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
+    home_frame = HomeFrame.objects(id=ObjectId(frame_id)).first()
+    if len(home_frame['panelContents']) > index:
+        home_frame['panelContents'].pop(index)
+        home_frame.save()
+    return jsonReturn.trueReturn(home_frame, 'ok')
+
+
 # name (左上角显示的标题名),sortOrder 排列顺序 status 是否使用 limitNum 限制数量
 # type == 0 表示轮播图 limitNum = 5 最多 5 个图
 # type == 1 就是活动版块（4幅图并排排列，没啥看头) limitNum = 4

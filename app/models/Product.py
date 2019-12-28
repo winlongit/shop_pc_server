@@ -36,6 +36,18 @@ class ProductCategory(db.Document):
     description = db.StringField(max_length=255)
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
 
+    @classmethod
+    def get_type_tree(cls, father_category):
+        res = []
+        pcs = ProductCategory.objects(father_category=father_category).all()
+        for pc in pcs:
+            one_category = {}
+            one_category.setdefault('id', pc['category'])
+            one_category.setdefault('name', pc['category'])
+            one_category.setdefault('children', cls.get_type_tree(pc['category']))
+            res.append(one_category)
+        return res
+
     def __str__(self):
         return self.category
 
@@ -53,6 +65,7 @@ class ProductCategory(db.Document):
 class Product(db.Document):
     name = db.StringField(max_length=255, verbose_name='商品名称', required=True)
     title = db.StringField(max_length=255, verbose_name='小标题，吸引人看的那个', required=True)
+    description = db.StringField(verbose_name='介绍')
     # description = db.StringField(max_length=255, verbose_name='商品描述')
     origin_price = db.IntField(verbose_name='原价 ，价格(整数:分)，注意单位是分', required=True)
     cur_price = db.IntField(verbose_name='现价格（折扣价）价格(整数:分)，注意单位是分', required=True)
