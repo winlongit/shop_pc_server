@@ -31,7 +31,6 @@ def add_frame():
     req_json = request.json
     if not req_json:
         return jsonReturn.falseReturn(request.path, '请上传必要参数')
-    # TODO 一些合法性验证需要增加，这里不管了
     frame_type = req_json.get('type')
     name = req_json.get('name')
     sortOrder = req_json.get('sortOrder')
@@ -56,6 +55,30 @@ def add_frame():
     return jsonReturn.trueReturn(home_frame, 'ok')
 
 
+@bp.route("/frame_panel/add", methods=['POST'])
+def frame_panel_add():
+    # 轮播图：2240 x 1108
+    req_json = request.json
+    if not req_json:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
+    frame_id = req_json.get('id')
+    panelContent_type = req_json.get('type')
+    panelContent_sortOrder = req_json.get('sortOrder')
+    panelContent_picUrl = req_json.get('picUrl')
+    panelContent_fulUrl = req_json.get('fulUrl')
+    panelContent_product_id = req_json.get('productId')
+    if not all([frame_id, panelContent_type is not None, panelContent_picUrl]):
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
+    onePanelContent = PanelContent(type=panelContent_type, sortOrder=panelContent_sortOrder,
+                                   picUrl=panelContent_picUrl, fulUrl=panelContent_fulUrl)
+    if panelContent_product_id:
+        onePanelContent.product_id = ObjectId(panelContent_product_id)
+    home_frame = HomeFrame.objects(id=ObjectId(frame_id)).first()
+    home_frame['panelContents'].append(onePanelContent)
+    home_frame.save()
+    return jsonReturn.trueReturn(home_frame, 'ok')
+
+
 # name (左上角显示的标题名),sortOrder 排列顺序 status 是否使用 limitNum 限制数量
 # type == 0 表示轮播图 limitNum = 5 最多 5 个图
 # type == 1 就是活动版块（4幅图并排排列，没啥看头) limitNum = 4
@@ -70,10 +93,8 @@ def add_frame():
 # 返回
 @bp.route("/get_frame", methods=['GET'])
 def home():
-    # 轮播图：2240 x 1108
-
     home_frames = HomeFrame.objects(status=1).order_by('sortOrder').all()
-    print(home_frames)
+    # print(home_frames)
     if not home_frames:
         return jsonReturn.trueReturn('', '当前没有数据')
     res = [mongo2dict.m2d(home_frame) for home_frame in home_frames]
@@ -81,13 +102,14 @@ def home():
         for panelContent in frame['panelContents']:
             # 是商品的时候,就要去 Product 中把商品的信息取出来
             if panelContent['type'] == 0 or panelContent['type'] == 2:
-                print(panelContent)
-                print(type(panelContent))
+                # print(panelContent)
+                # print(type(panelContent))
                 prod = Product.objects(id=panelContent.pop('product_id')).first()
                 # 合并两个 dict
-                panelContent.update(mongo2dict.m2d(prod))
-                print(panelContent)
-    print(res)
+                if prod:
+                    panelContent.update(mongo2dict.m2d(prod))
+                    # print(panelContent)
+    # print(res)
     return jsonReturn.trueReturn(res, 'ok')
     # return jsonify({"success": True, "message": "success", "code": 200, "timestamp": 1572182342709, "result": [
     #     {"id": 7, "name": "轮播图", "type": 0, "sortOrder": 0, "position": 0, "limitNum": 5, "status": 1, "remark": "",

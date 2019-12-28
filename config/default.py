@@ -56,5 +56,7 @@ class Config(Secret):
                    '/api/v1/order/del_order',
                    '/api/v1/order/notifyurl',
                    '/api/v1/home/add_frame',
+                   '/api/v1/home/edit_frame',
+                   '/api/v1/home/frame_panel/add',
                    '/api/v1/home/get_frame'
                    ]

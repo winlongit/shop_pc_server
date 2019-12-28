@@ -48,7 +48,7 @@ def get_blank():
     return send_file(io.BytesIO(gif_str), mimetype='image/gif')
 
 
-# 上传图片，我们这里使用 sm.ms 图传，把传回来的 url 保存在mongodb中
+# 上传图片，我们这里使用 微信对象存储（sm.ms 图床太垃圾了），把传回来的 url 保存在mongodb中
 # element ui 的上传图片
 @bp.route("/img_upload_ui", methods=['POST'])
 def img_upload_ui():
@@ -72,7 +72,7 @@ def img_upload_ui():
             img_url = cdn_domain + file_MD5
             pic = Picture.objects(img_name=file_MD5).first()
             if pic:
-                return jsonReturn.falseReturn({'sm_url': img_url}, '该文件已经存在了，如果和你的不同，请修改文件名称')
+                return jsonReturn.falseReturn({'sm_url': img_url}, '该文件已经存在了')
             # 腾讯 cos python sdk
             img_obj.seek(0)  # 前面计算 md5 的时候已经 read(） 一次了，这里要再读取一次，需要把游标归 0
             cos_client.put_object(Bucket=cos_bucket, Body=img_obj, Key=file_MD5, EnableMD5=False)
