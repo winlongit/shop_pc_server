@@ -43,6 +43,7 @@ class Config(Secret):
                    '/api/v1/product/add_good',
                    '/api/v1/product/get_good_detail',
                    '/api/v1/product/real_delete',
+                   '/api/v1/product/update_price',
                    '/api/v1/img/test',
                    '/api/v1/img/img_upload_ui',
                    '/api/v1/cart/add',

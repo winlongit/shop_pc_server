@@ -250,3 +250,18 @@ def real_delete():
         return jsonReturn.trueReturn('', '删除成功')
     except Exception as e:
         return jsonReturn.falseReturn('', str(e))
+
+
+@bp.route('/update_price', methods=['POST'])
+def update_price():
+    req_json = request.json
+    product_id = req_json.get('productId')
+    cur_price = req_json.get('cur_price')
+    origin_price = req_json.get('origin_price')
+    if not all([product_id, cur_price is not None, origin_price is not None]):
+        return jsonReturn.falseReturn(request.path, '请上传必要的参数productId,cur_price,origin_price')
+    try:
+        Product.objects(id=ObjectId(product_id)).update_one(cur_price=int(cur_price), origin_price=int(origin_price))
+        return jsonReturn.trueReturn('', '修改成功')
+    except Exception as e:
+        return jsonReturn.falseReturn('', str(e))
