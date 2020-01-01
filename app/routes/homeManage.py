@@ -101,7 +101,7 @@ def frame_panel_del():
     frame_id = req_json.get('id')
     # 需要删除的index，第几个
     index = req_json.get('index')
-    if not all([frame_id, index]):
+    if not all([frame_id, index is not None]):
         return jsonReturn.falseReturn(request.path, '请上传必要参数')
     home_frame = HomeFrame.objects(id=ObjectId(frame_id)).first()
     if len(home_frame['panelContents']) > index:
