@@ -181,6 +181,8 @@ def add_good():
     """
     print(request.json)
     req_json = request.json
+    if not req_json:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
     name = req_json.get('name')
     title = req_json.get('title')
     description = req_json.get('description')
@@ -218,6 +220,8 @@ def edit_good():
     """
     print(request.json)
     req_json = request.json
+    if not req_json:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
     pro_id = req_json.get('id')
     name = req_json.get('name')
     title = req_json.get('title')
@@ -242,6 +246,8 @@ def edit_good():
 @bp.route('/real_delete', methods=['POST'])
 def real_delete():
     req_json = request.json
+    if not req_json:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
     product_id = req_json.get('productId')
     if not product_id:
         return jsonReturn.falseReturn(request.path, '请上传必要的参数productId')
@@ -255,6 +261,8 @@ def real_delete():
 @bp.route('/update_price', methods=['POST'])
 def update_price():
     req_json = request.json
+    if not req_json:
+        return jsonReturn.falseReturn(request.path, '请上传必要参数')
     product_id = req_json.get('productId')
     cur_price = req_json.get('cur_price')
     origin_price = req_json.get('origin_price')

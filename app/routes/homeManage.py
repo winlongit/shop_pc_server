@@ -57,6 +57,16 @@ def add_frame():
 
 @bp.route("/frame_panel/add", methods=['POST'])
 def frame_panel_add():
+    '''
+    req_json.get('id')
+    panelContent_type = req_json.get('type')
+    panelContent_sortOrder = req_json.get('sortOrder')
+    panelContent_picUrl = req_json.get('picUrl')
+    panelContent_fulUrl = req_json.get('fulUrl')
+    panelContent_product_id = req_json.get('productId')
+    panel_index = req_json.get('index')
+    :return:
+    '''
     # 轮播图：2240 x 1108
     req_json = request.json
     if not req_json:
@@ -74,7 +84,10 @@ def frame_panel_add():
     if panelContent_product_id:
         onePanelContent.product_id = ObjectId(panelContent_product_id)
     home_frame = HomeFrame.objects(id=ObjectId(frame_id)).first()
-    home_frame['panelContents'].append(onePanelContent)
+    panel_index = req_json.get('index')
+    if panel_index is None:
+        panel_index = len(home_frame['panelContents'])
+    home_frame['panelContents'].insert(panel_index, onePanelContent)
     home_frame.save()
     return jsonReturn.trueReturn(home_frame, 'ok')
 

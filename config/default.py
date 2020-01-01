@@ -7,6 +7,8 @@ from .secret import Secret
 class Config(Secret):
     RESULT_ERROR = 0
     RESULT_SUCCESS = 1
+    # 解决flask接口返回的内容中文乱码的问题
+    JSON_AS_ASCII = False
 
     MONGODB_SETTINGS = {'ALIAS': 'default',
                         'DB': 'lemong_shop',
