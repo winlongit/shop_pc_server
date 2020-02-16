@@ -134,7 +134,7 @@ def get_goods():
         if price_min:
             query_set = query_set.filter(cur_price__gte=int(price_min))
         if keyword:
-            query_set = query_set.filter(name__contain=keyword)
+            query_set = query_set.filter(name__contains=keyword)
         if sort:
             if sort == "升序":
                 query_set = query_set.order_by('+cur_price')
