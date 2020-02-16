@@ -122,6 +122,7 @@ def get_goods():
         price_max = req_args.get('price_max')
         category_lv1 = req_args.get('type')
         category_lv2 = req_args.get('category')
+        keyword = req_args.get('keyword')
         # from mongoengine.queryset.visitor import Q
         # 类别空的话，就不需要在类别里面搜索
         if category_lv1:
@@ -132,6 +133,8 @@ def get_goods():
             query_set = query_set.filter(cur_price__lte=int(price_max))
         if price_min:
             query_set = query_set.filter(cur_price__gte=int(price_min))
+        if keyword:
+            query_set = query_set.filter(name__contain=keyword)
         if sort:
             if sort == "升序":
                 query_set = query_set.order_by('+cur_price')
