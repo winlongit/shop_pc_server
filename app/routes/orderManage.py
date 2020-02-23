@@ -100,7 +100,8 @@ def new_order():
         return jsonReturn.falseReturn('', '这个总价有问题啊，数据库算出来的和你不一样')
     # 不是 VIP 的首次消费需要满 288
     if not user.vip and total_fee < 28800:
-        return jsonReturn.falseReturn('', '非会员需要首次消费满 288 元')
+        from flask import jsonify
+        return jsonify({"status": "failed", "message": '您是非会员，首次消费需满 288 元', "code": "500", "success": False})
     try:
         user_order = UserOrder(user_id=user, goodsList=embeddedGoodsList, total_fee=total_fee, userName=userName,
                                tel=tel,
