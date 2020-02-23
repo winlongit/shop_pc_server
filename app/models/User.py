@@ -35,7 +35,7 @@ class User(db.Document):
     _password = db.StringField(max_length=255, verbose_name='用户密码')
     active = db.BooleanField(default=True, verbose_name='当前账户是否激活')
     # avatar = db.StringField(max_length=512, verbose_name='头像url地址',default='http://cdn.ailemong.com/fbfbc403881a41f93f1fa2a37f25424f.png')
-
+    vip = db.BooleanField(default=False, verbose_name='当前账号是否是 VIP，首次消费需要满288才能成为VIP')
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
 
     roles = db.ListField(db.ReferenceField(Role), default=[])

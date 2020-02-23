@@ -98,6 +98,9 @@ def new_order():
     # 检查总价对不对
     if total_fee != int(orderTotal * 100):
         return jsonReturn.falseReturn('', '这个总价有问题啊，数据库算出来的和你不一样')
+    # 不是 VIP 的首次消费需要满 288
+    if not user.vip and total_fee < 28800:
+        return jsonReturn.falseReturn('', '非会员需要首次消费满 288 元')
     try:
         user_order = UserOrder(user_id=user, goodsList=embeddedGoodsList, total_fee=total_fee, userName=userName,
                                tel=tel,
