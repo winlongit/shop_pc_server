@@ -201,6 +201,11 @@ def get_notify_url():
             try:
                 # 这里加个 total_fee=total_fee 是为了验证支付的金额和我们应该收到的金额是一样的
                 UserOrder.objects(id=ObjectId(order_id), total_fee=total_fee).update_one(ischeck=True, status='支付成功')
+                user = UserOrder.objects(id=UserOrder.user_id)
+                # 这个付款成功，如果不是 VIP 但是付款成功了，肯定是满足付款条件了，那也升级为 VIP
+                if not user.vip:
+                    user.vip = True
+                    user.save()
                 # 然后就可以根据返回的结果，处理之前的订单了。
                 # TODO 写上处理结果的逻辑。存储数据库之类的
                 # 唯一需要注意的一点，微信推送消息后，需要给微信服务器返回一个消息：
