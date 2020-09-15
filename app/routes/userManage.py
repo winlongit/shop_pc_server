@@ -18,6 +18,7 @@ import time
 
 __author__ = 'Max_Pengjb'
 
+from bson import ObjectId
 from flask import request, g, Blueprint
 from app.models.User import User, Permission
 from app import jsonReturn
@@ -50,11 +51,16 @@ def register():
     req_json = request.json
     username = req_json.get('userName')
     password = req_json.get('userPwd')
+    referrer = req_json.get('referrerId')
     if not username or not password:
         return jsonReturn.falseReturn('', '用户名和密码不能为空')
     if User.objects(username=username).first():
         return jsonReturn.falseReturn('', '用户名已存在')
-    user = User.register(username, password)
+    if not referrer:
+        referrer = User.objects(username='admin').first()
+    else:
+        referrer = ObjectId(referrer)
+    user = User.register(username, password, referrer)
     # 这里User的password做了特别处理，需要加密保存，单独写了方法新建用户
     # password 是通过@property 和 @property.setter 来定义的，真正的 password 是 _password
     print(user.to_mongo())

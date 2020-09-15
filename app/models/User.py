@@ -1,7 +1,8 @@
+from bson import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.models import db
-
+from mongoengine import NULLIFY
 import datetime
 
 
@@ -36,6 +37,7 @@ class User(db.Document):
     active = db.BooleanField(default=True, verbose_name='当前账户是否激活')
     # avatar = db.StringField(max_length=512, verbose_name='头像url地址',default='http://cdn.ailemong.com/fbfbc403881a41f93f1fa2a37f25424f.png')
     vip = db.BooleanField(default=False, verbose_name='当前账号是否是 VIP，首次消费需要满288才能成为VIP')
+    referrer = db.ReferenceField("self", reverse_delete_rule=NULLIFY, verbose_name='推荐注册人，这个是要返利用的')
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
 
     roles = db.ListField(db.ReferenceField(Role), default=[])
@@ -51,8 +53,8 @@ class User(db.Document):
         self.roles = list(set(self.roles))
 
     @staticmethod
-    def register(username, password):
-        new_user = User(username=username, _password=generate_password_hash(password))
+    def register(username, password, referrer):
+        new_user = User(username=username, _password=generate_password_hash(password), referrer=referrer)
         new_user.save()
         return new_user
 
