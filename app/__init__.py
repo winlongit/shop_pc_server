@@ -98,7 +98,7 @@ def create_app():
                 user = User.objects(username=payload['data']['username']).first()
                 # TODO 这里判断 user 存在不存在，实际应该用 redis 来做,token 存的肯定是登录过的用户啊，没有登录不会在token里面
                 if user is None:
-                    return jsonReturn.falseReturn('', '错误的token')
+                    return jsonReturn.falseReturn('', '错误的token', 403)
                 username = user.username
                 # 设置一个该次访问的全局 username，用于response 检查是否登录，登录了的话就更新 token
                 g.username = username
@@ -113,11 +113,11 @@ def create_app():
                         # print(user.username, user.roles, permissions)
                 # print(request.path)
                 if request.path not in permissions and '*' not in permissions:
-                    return jsonReturn.falseReturn(request.path, '没有访问权限')
+                    return jsonReturn.falseReturn(request.path, '没有访问权限', 403)
             else:
                 # 返回 token 过期，或者 token 无效
                 # print(payload)
-                return jsonReturn.falseReturn('', payload)
+                return jsonReturn.falseReturn('', payload, 403)
         else:
             # TODO token不存在只有一种情况： 系统临时用户，权限只有config['ALLOWED_URL']里的
             # 生成唯一id
@@ -125,7 +125,7 @@ def create_app():
             #     random.choice(string.ascii_letters + string.digits) for _ in range(16)))
             # 不在可匿名访问的目录中，就返回错误
             if request.path not in config.ALLOWED_URL:
-                return jsonReturn.falseReturn(request.path, '需要登录')
+                return jsonReturn.falseReturn(request.path, '需要登录', 403)
 
     # 请求结束后干的事
     @app.after_request

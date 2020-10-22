@@ -204,8 +204,7 @@ def get_notify_url():
                 user = UserOrder.objects(id=UserOrder.user_id)
                 # 这个付款成功，如果不是 VIP 但是付款成功了，肯定是满足付款条件了，那也升级为 VIP
                 if not user.vip:
-                    user.vip = True
-                    user.save()
+                    user.save_as_vip()
                 # 然后就可以根据返回的结果，处理之前的订单了。
                 # TODO 写上处理结果的逻辑。存储数据库之类的
                 # 唯一需要注意的一点，微信推送消息后，需要给微信服务器返回一个消息：

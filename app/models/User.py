@@ -37,6 +37,7 @@ class User(db.Document):
     active = db.BooleanField(default=True, verbose_name='当前账户是否激活')
     # avatar = db.StringField(max_length=512, verbose_name='头像url地址',default='http://cdn.ailemong.com/fbfbc403881a41f93f1fa2a37f25424f.png')
     vip = db.BooleanField(default=False, verbose_name='当前账号是否是 VIP，首次消费需要满288才能成为VIP')
+    user_type = db.StringField(default='consumer', verbose_name='普通用户 consumer，会员用户 vip, 代理 agent')
     referrer = db.ReferenceField("self", reverse_delete_rule=NULLIFY, verbose_name='推荐注册人，这个是要返利用的')
     create_time = db.DateTimeField(default=datetime.datetime.now, verbose_name='创建时间')
 
@@ -53,10 +54,23 @@ class User(db.Document):
         self.roles = list(set(self.roles))
 
     @staticmethod
-    def register(username, password, referrer):
-        new_user = User(username=username, _password=generate_password_hash(password), referrer=referrer)
+    def register(username, password, referrer, user_type=None):
+        new_user = User(username=username, _password=generate_password_hash(password), referrer=referrer,
+                        user_type=user_type)
         new_user.save()
         return new_user
+
+    # 升级为会员用户
+    def save_as_vip(self):
+        self.vip = True
+        self.user_type = 'vip'
+        return self.save()
+
+    # 升级为代理
+    def save_as_agent(self):
+        self.user_type = 'agent'
+        self.vip = True
+        return self.save()
 
     @property
     def password(self):
