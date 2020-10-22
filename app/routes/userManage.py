@@ -77,6 +77,7 @@ def register():
         return jsonReturn.falseReturn('', '用户注册失败')
 
 
+# login
 @bp.route('/login', methods=['POST'])
 def login():
     """
@@ -111,6 +112,20 @@ def login():
                                              '登录成功')
             else:
                 return jsonReturn.falseReturn('', '密码不正确')
+
+
+# logout
+@bp.route('/logout', methods=['POST'])
+def logout():
+    """
+    用户登录
+    :return: json
+    """
+    username = g.username
+    # todo
+    # something to do when a user post logout request
+    print(username, ' logout')
+    return jsonReturn.trueReturn('', 'logout')
 
 
 @bp.route('/user_info', methods=['GET'])

@@ -2,7 +2,8 @@
 ```
 if updated:
 git pull
-sudo supervisor restart shop_pc_server
+sudo supervisorctl status
+sudo supervisorctl restart shop_pc_server
 ```
 
-uwsgi.ini has the uwsgi config
+the file uwsgi.ini in current directory has the uwsgi config

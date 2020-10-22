@@ -28,7 +28,7 @@ def trueReturn(data, msg):
     })
 
 
-def falseReturn(data, msg, code):
+def falseReturn(data, msg, code=None):
     return jsonify({
         "status": "failed",
         "message": "failed",
